@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ChatPy Ultra</title>
+<style>
+:root{
+  --accent:#00e5ff;
+  --radius:14px;
+  --bg-standard: linear-gradient(135deg,#0f172a,#071127);
+  --bg-peach: linear-gradient(135deg,#ffb347,#da22ff);
+  --bg-white: #ffffff;
+  --bg-watermelon: linear-gradient(135deg,#8cffb3,#ff4d4d);
+  --bg-citrus: linear-gradient(135deg,#e6ffb3,#aeea00);
+  --text-standard: #eaf7ff;
+  --text-white: #000;
+  --text-dark: #222;
+  --card: rgba(255,255,255,0.03);
+  --muted: rgba(234,247,255,0.6);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif;transition:all 0.5s;}
+body.standard{background: var(--bg-standard); color: var(--text-standard);}
+body.peach{background: var(--bg-peach); color: #fff;}
+body.white{background: var(--bg-white); color: var(--text-white);}
+body.watermelon{background: var(--bg-watermelon); color: var(--text-dark);}
+body.citrus{background: var(--bg-citrus); color: var(--text-dark);}
+.app {max-width:1200px;margin:18px auto;padding:12px;display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;transition:all 0.5s;}
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;transition:all 0.5s;}
+.brand{display:flex;gap:12px;align-items:center;}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#00e5ff,#0077ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#002;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:all 0.5s;}
+h1{margin:0;font-size:1.25rem;}
+.sub{font-size:0.85rem;color:var(--muted);}
+.chat-panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);padding:14px;min-height:78vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.03);box-shadow:0 16px 50px rgba(0,0,0,0.45);transition:all 0.5s;}
+.controls{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.big-meta{display:flex;gap:12px;align-items:center;}
+button, select, input{touch-action: manipulation; cursor:pointer; -webkit-tap-highlight-color: transparent;transition:all 0.3s;}
+button:hover{transform:scale(1.05);}
+.small-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;color:inherit;}
+.reset-btn{background:#ff6b6b;border:none;color:white;padding:10px 14px;border-radius:10px;font-weight:700;}
+.send-btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#001;font-weight:800;}
+.chat-area{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
+.msg{max-width:78%;padding:12px 14px;border-radius:12px;line-height:1.35;opacity:0;transform:translateY(10px) scale(0.95);animation:fadeUp var(--msg-duration,0.2s) ease forwards;transition:all 0.4s;}
+.msg.user{align-self:flex-end;background:linear-gradient(90deg,#00bcd4,#0288d1);color:#012;box-shadow:0 8px 24px rgba(0,0,0,0.45);}
+.msg.bot{align-self:flex-start;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+.input-row{display:flex;gap:8px;margin-top:12px;align-items:center;}
+.text-input{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;outline:none;font-size:1rem;}
+.text-input:focus{border-color:var(--accent);}
+.sidebar{background:var(--card);border-radius:var(--radius);padding:12px;min-height:78vh;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,0.45);}
+.sidebar h3{margin:0;cursor:pointer;padding:4px 8px;border-radius:8px;}
+.sidebar h3:hover{background:rgba(0,0,0,0.1);transform:scale(1.05);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:50;}
+.overlay .card{width:720px;max-width:94%;background:linear-gradient(180deg,#071026,#0f172a);padding:22px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);color:inherit;box-shadow:0 20px 60px rgba(0,0,0,0.6);position:relative;animation:fadeUp 0.3s ease forwards;}
+body.white .overlay .card{color:#000;}
+body.white .overlay select{color:#000;background:#fff;}
+.overlay h2{margin:0 0 12px 0;}
+.overlay .close{position:absolute;right:14px;top:14px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:1.5rem;}
+.setting-group{margin:12px 0;}
+.setting-group label{display:block;margin-bottom:6px;font-weight:700;}
+.setting-group select{width:100%;}
+#madeInMemmingen{font-size:0.8rem;margin-top:12px;color:var(--muted);}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr; padding:8px;}
+  .chat-panel{min-height:60vh;}
+  .sidebar{min-height:auto;margin-top:12px;}
+  .text-input{font-size:0.95rem;}
+  .send-btn, .small-btn, .reset-btn{padding:8px 10px; font-size:0.9rem;}
+}
+</style>
+</head>
+<body class="standard">
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">CP</div>
+      <div>
+        <h1>ChatPy Ultra</h1>
+        <div class="sub">Lokal. Offline. Deine Daten.</div>
+      </div>
+    </div>
+    <div class="big-meta">
+      <button class="small-btn" id="openSettings">⚙</button>
+      <button class="reset-btn" id="resetBtn">Reset</button>
+    </div>
+  </header>
+  <section class="chat-panel">
+    <div class="controls"><div style="flex:1"><strong id="currentLangLabel">Sprache: Auto</strong></div></div>
+    <div class="chat-area" id="chatArea"></div>
+    <div class="input-row">
+      <input id="userInput" class="text-input" placeholder="Schreibe... (Enter sendet)" />
+      <button id="sendBtn" class="send-btn">Send</button>
+    </div>
+  </section>
+  <aside class="sidebar" id="sidebar"></aside>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="card">
+    <button class="close" id="closeOverlay">✖</button>
+    <h2>Einstellungen</h2>
+    <div class="setting-group">
+      <label for="themeSelect">Design Theme:</label>
+      <select id="themeSelect">
+        <option value="standard">Standard</option>
+        <option value="peach">Peach</option>
+        <option value="white">White</option>
+        <option value="watermelon">Watermelon</option>
+        <option value="citrus">Citrus</option>
+      </select>
+    </div>
+    <div class="setting-group">
+      <label for="langSelect">Sprache:</label>
+      <select id="langSelect">
+        <option value="de">Deutsch</option>
+        <option value="en">Englisch</option>
+        <option value="es">Spanisch</option>
+        <option value="it">Italienisch</option>
+        <option value="fr">Französisch</option>
+      </select>
+    </div>
+    <div id="madeInMemmingen">Made in Memmingen ❤️</div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const chatArea = document.getElementById('chatArea');
+  const userInput = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const openSettings = document.getElementById('openSettings');
+  const overlay = document.getElementById('overlay');
+  const closeOverlay = document.getElementById('closeOverlay');
+  const sidebar = document.getElementById('sidebar');
+  const themeSelect = document.getElementById('themeSelect');
+
+  let chatHistory = [];
+  let allChats = [];
+
+  function appendMsg(text, who='bot'){
+    const el = document.createElement('div');
+    el.className = 'msg ' + (who==='user'?'user':'bot');
+    el.style.setProperty('--msg-duration', (0.15 + Math.random()*0.3)+'s');
+    el.textContent = text;
+    chatArea.appendChild(el);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    return el;
+  }
+
+  function sendMessage(){
+    const text = userInput.value.trim();
+    if(!text) return;
+    userInput.value='';
+    chatHistory.push(text);
+    appendMsg(text,'user');
+    setTimeout(()=>appendMsg("Das kann ich noch nicht.",'bot'),250);
+  }
+
+  function saveChat(){
+    allChats.unshift({title: "Chat " + (allChats.length+1), messages: [...chatHistory]});
+    if(allChats.length>8) allChats.pop();
+    renderSidebar();
+  }
+
+  function renderSidebar(){
+    sidebar.innerHTML='';
+    allChats.forEach((chat,index)=>{
+      const h3 = document.createElement('h3');
+      h3.textContent = chat.title;
+      h3.addEventListener('click',()=>{loadChat(index)});
+      sidebar.appendChild(h3);
+    });
+  }
+
+  function loadChat(index){
+    chatArea.innerHTML='';
+    chatHistory = [...allChats[index].messages];
+    chatHistory.forEach(msg=>appendMsg(msg,'user'));
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  sendBtn.addEventListener('touchstart', sendMessage);
+  userInput.addEventListener('keydown', e=>{if(e.key==='Enter') sendMessage();});
+  resetBtn.addEventListener('click', ()=>{
+    if(chatHistory.length) saveChat();
+    chatHistory=[];
+    chatArea.innerHTML='';
+    appendMsg('Hey — ich bin ChatPy Ultra.');
+  });
+  resetBtn.addEventListener('touchstart', ()=>{
+    if(chatHistory.length) saveChat();
+    chatHistory=[];
+    chatArea.innerHTML='';
+    appendMsg('Hey — ich bin ChatPy Ultra.');
+  });
+
+  openSettings.addEventListener('click', ()=>overlay.style.display='flex');
+  openSettings.addEventListener('touchstart', ()=>overlay.style.display='flex');
+  closeOverlay.addEventListener('click', ()=>overlay.style.display='none');
+  closeOverlay.addEventListener('touchstart', ()=>overlay.style.display='none');
+
+  themeSelect.addEventListener('change', ()=>{
+    document.body.className = themeSelect.value;
+  });
+
+  appendMsg('Hey — ich bin ChatPy Ultra.');
+})();
+</script>
+</body>
+</html>
