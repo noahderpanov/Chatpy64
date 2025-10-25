@@ -9,10 +9,10 @@
   --accent:#00e5ff;
   --radius:14px;
   --bg-standard: linear-gradient(135deg,#0f172a,#071127);
-  --bg-peach: linear-gradient(135deg,#ffb347,#da22ff);
+  --bg-peach: linear-gradient(135deg,#ff9966,#da22ff);
   --bg-white: #ffffff;
-  --bg-watermelon: linear-gradient(135deg,#8cffb3,#ff4d4d);
-  --bg-citrus: linear-gradient(135deg,#e6ffb3,#aeea00);
+  --bg-watermelon: linear-gradient(135deg,#a8ffb5,#ff6666);
+  --bg-citrus: linear-gradient(135deg,#c6ff91,#b2ff59);
   --text-standard: #eaf7ff;
   --text-white: #000;
   --text-dark: #222;
@@ -41,9 +41,9 @@ button:hover{transform:scale(1.05);}
 .reset-btn{background:#ff6b6b;border:none;color:white;padding:10px 14px;border-radius:10px;font-weight:700;}
 .send-btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#001;font-weight:800;}
 .chat-area{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
-.msg{max-width:78%;padding:12px 14px;border-radius:12px;line-height:1.35;opacity:0;transform:translateY(10px) scale(0.95);animation:fadeUp var(--msg-duration,0.2s) ease forwards;transition:all 0.4s;}
+.msg{max-width:78%;padding:12px 14px;border-radius:12px;line-height:1.35;opacity:0;transform:translateY(10px) scale(0.95);animation:fadeUp var(--msg-duration,0.3s) ease forwards;transition:all 0.4s;}
 .msg.user{align-self:flex-end;background:linear-gradient(90deg,#00bcd4,#0288d1);color:#012;box-shadow:0 8px 24px rgba(0,0,0,0.45);}
-.msg.bot{align-self:flex-start;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);}
+.msg.bot{align-self:flex-start;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.08);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
 .input-row{display:flex;gap:8px;margin-top:12px;align-items:center;}
 .text-input{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;outline:none;font-size:1rem;}
@@ -155,7 +155,9 @@ body.white .overlay select{color:#000;background:#fff;}
     userInput.value='';
     chatHistory.push(text);
     appendMsg(text,'user');
-    setTimeout(()=>appendMsg("Das kann ich noch nicht.",'bot'),250);
+    setTimeout(()=>{
+      appendMsg("🕒 Sorry, messaging isn’t available yet. Please wait 1–3 days.\n💬 Entschuldigung, das Senden von Nachrichten ist noch nicht verfügbar. Bitte warte 1–3 Tage.",'bot');
+    },400);
   }
 
   function saveChat(){
@@ -180,26 +182,23 @@ body.white .overlay select{color:#000;background:#fff;}
     chatHistory.forEach(msg=>appendMsg(msg,'user'));
   }
 
-  sendBtn.addEventListener('click', sendMessage);
-  sendBtn.addEventListener('touchstart', sendMessage);
-  userInput.addEventListener('keydown', e=>{if(e.key==='Enter') sendMessage();});
-  resetBtn.addEventListener('click', ()=>{
-    if(chatHistory.length) saveChat();
-    chatHistory=[];
-    chatArea.innerHTML='';
-    appendMsg('Hey — ich bin ChatPy Ultra.');
-  });
-  resetBtn.addEventListener('touchstart', ()=>{
-    if(chatHistory.length) saveChat();
-    chatHistory=[];
-    chatArea.innerHTML='';
-    appendMsg('Hey — ich bin ChatPy Ultra.');
-  });
+  // Touch + Klick für Handy
+  function safeClick(el, func){
+    el.addEventListener('click', func);
+    el.addEventListener('touchend', e => { e.preventDefault(); func(); });
+  }
 
-  openSettings.addEventListener('click', ()=>overlay.style.display='flex');
-  openSettings.addEventListener('touchstart', ()=>overlay.style.display='flex');
-  closeOverlay.addEventListener('click', ()=>overlay.style.display='none');
-  closeOverlay.addEventListener('touchstart', ()=>overlay.style.display='none');
+  safeClick(sendBtn, sendMessage);
+  safeClick(resetBtn, ()=>{
+    if(chatHistory.length) saveChat();
+    chatHistory=[];
+    chatArea.innerHTML='';
+    appendMsg('Hey — ich bin ChatPy Ultra.');
+  });
+  safeClick(openSettings, ()=>overlay.style.display='flex');
+  safeClick(closeOverlay, ()=>overlay.style.display='none');
+
+  userInput.addEventListener('keydown', e=>{if(e.key==='Enter') sendMessage();});
 
   themeSelect.addEventListener('change', ()=>{
     document.body.className = themeSelect.value;
